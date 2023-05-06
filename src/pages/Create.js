@@ -11,7 +11,7 @@ function Create() {
     const [profile, setProfile] = useState('1')
     const [birthDate, setBirthDate] = useState(new Date('2014-08-18'));
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', backgroundColor: '#e5e5e5' }}>
             <Box sx={{ display: 'flex', width: '100%', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', width: '100%', justifyContent: 'center' }}>
                     <Card sx={{ width: '30%', height: '70vh', mr: 5, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', p: 2, flexDirection: 'column' }} elevation={20}>
