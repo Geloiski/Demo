@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Card, IconButton, Avatar, Badge, TextField, Radio, RadioGroup, FormControlLabel, MenuItem, Typography } from '@mui/material'
+import { Box, Card, IconButton, Avatar, Badge, TextField, Radio, RadioGroup, FormControlLabel, MenuItem, Typography, Button } from '@mui/material'
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
@@ -7,21 +7,29 @@ import { LocalizationProvider, DesktopDatePicker } from '@mui/x-date-pickers';
 import { MuiTelInput } from 'mui-tel-input'
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
-import remy from '../1.jpg'
-
+import SaveIcon from '@mui/icons-material/Save';
+import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
 //backend
-import { db } from '../utils/firebase';
-
+import { db, storage } from '../utils/firebase';
+import { collection, addDoc } from "firebase/firestore";
+import {
+    ref,
+    uploadBytesResumable,
+    getDownloadURL
+} from "firebase/storage";
+import moment from 'moment/moment';
 
 function Create() {
-    const [profile, setProfile] = useState('1')
+    const [profile, setProfile] = useState('')
+    const [image, setimage] = useState()
+    const [imageURL, setImageURL] = useState()
     const [birthday, setBirthday] = useState(dayjs('2014-08-18'));
     const [mobileNum, setMobileNum] = useState('')
     const handleDate = (newValue) => {
         setBirthday(newValue);
     };
     const handleValidity = (newValue) => {
-        setMobileNum(newValue)
+        setMobileNum(newValue);
     }
     const [payload, setPayload] = useState({
         firstname: '',
@@ -47,7 +55,7 @@ function Create() {
         skills: '',
         email: '',
     })
-    const currencies = [
+    const civilStatus = [
         {
             value: 'single',
             label: 'Single',
@@ -72,11 +80,121 @@ function Create() {
     const handleChange = (prop) => (event) => {
         setPayload({ ...payload, [prop]: event.target.value });
     };
+    function handleImageChange(event) {
+        console.log(event.target.files);
+        setimage(event.target.files[0])
+        setProfile(URL.createObjectURL(event.target.files[0]));
 
-    useEffect(() => {
-        console.log(payload)
-        console.log(mobileNum)
-    }, [payload, mobileNum])
+    }
+    const handleUpload = () => {
+        if (!image) {
+            alert("Please upload an image first!");
+        }
+        const storageRef = ref(storage, `/files/${image.name}`);
+
+        // progress can be paused and resumed. It also exposes progress updates.
+        // Receives the storage reference and the file to upload.
+        const uploadTask = uploadBytesResumable(storageRef, image);
+
+        uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+                const percent = Math.round(
+                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                );
+
+                // update progress
+                console.log(percent);
+            },
+            (err) => console.log(err),
+            () => {
+                // download url
+                getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+                    setImageURL(url)
+                }).then(() => {
+                    handleAdd()
+                });
+            }
+        );
+    };
+    const handleAdd = async () => {
+        if (
+            payload.firstname === "" ||
+            payload.lastname === "" ||
+            payload.age === "" ||
+            birthday === "" ||
+            payload.address === "" ||
+            payload.email === "" ||
+            mobileNum === ""
+        ) {
+            alert("It seems like you've missed some requirements.");
+        } else {
+            await addDoc(collection(db, "dataCollection"), {
+                image: imageURL,
+                firstname: payload.firstname,
+                lastname: payload.lastname,
+                middlename: payload.middlename,
+                age: payload.age,
+                birthdate: moment(birthday).format('ll'),
+                address: payload.address,
+                gender: payload.gender,
+                height: payload.height,
+                weight: payload.weight,
+                status: payload.status,
+                religion: payload.religion,
+                citizenship: payload.citizenship,
+                occupation: payload.occupation,
+                languageSpoken: payload.languageSpoken,
+                elementary: payload.elementary,
+                elementaryYearGraduated: payload.elementaryYearGraduated,
+                highSchool: payload.highSchool,
+                highSchoolYearGraduated: payload.highSchoolYearGraduated,
+                college: payload.college,
+                collegeYearGraduated: payload.collegeYearGraduated,
+                degree: payload.degree,
+                skills: payload.skills,
+                email: payload.email,
+                mobileNumber: mobileNum,
+            });
+            handleClear();
+        }
+    };
+    const handleClear = () => {
+        setProfile('')
+        setimage()
+        setImageURL('')
+        setBirthday(dayjs('2014-08-18'))
+        setMobileNum('')
+        setPayload({
+            ...payload,
+            firstname: '',
+            lastname: '',
+            middlename: '',
+            age: '',
+            address: '',
+            gender: 'female',
+            height: '',
+            weight: '',
+            status: 'single',
+            religion: '',
+            citizenship: '',
+            occupation: '',
+            languageSpoken: '',
+            elementary: '',
+            elementaryYearGraduated: '',
+            highSchool: '',
+            highSchoolYearGraduated: '',
+            college: '',
+            collegeYearGraduated: '',
+            degree: '',
+            skills: '',
+            email: '',
+        });
+    };
+    // useEffect(() => {
+    //     console.log(payload)
+    //     console.log(mobileNum)
+    // }, [payload, mobileNum])
 
     return (
         <Box sx={{ width: '100%', backgroundColor: '#e5e5e5' }}>
@@ -86,7 +204,7 @@ function Create() {
                         <Box sx={{ display: 'flex', height: '30%', mb: 5, mt: 5 }}>
                             {profile === '' ?
                                 <IconButton color="primary" aria-label="upload picture" component="label" sx={{ zIndex: 1 }}>
-                                    <input hidden accept="image/*" type="file" />
+                                    <input hidden accept="image/*" type="file" onChange={handleImageChange} />
                                     <Avatar
                                         sx={{ width: 200, height: 200 }}
                                     >
@@ -98,7 +216,7 @@ function Create() {
                                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                                     badgeContent={
                                         <IconButton color="primary" aria-label="upload picture" component="label" sx={{ zIndex: 1 }}>
-                                            <input hidden accept="image/*" type="file" />
+                                            <input hidden accept="image/*" type="file" onChange={handleImageChange} />
                                             <ChangeCircleIcon sx={{
                                                 fontSize: 52, opacity: 0.5,
                                                 "&:hover": {
@@ -109,7 +227,7 @@ function Create() {
                                     }>
                                     <Avatar
                                         alt="Remy Sharp"
-                                        src={remy}
+                                        src={profile}
                                         sx={{
                                             width: 200, height: 200,
                                         }}
@@ -183,7 +301,6 @@ function Create() {
                             <RadioGroup
                                 row
                                 aria-labelledby="demo-row-radio-buttons-group-label"
-                                name="row-radio-buttons-group"
                                 value={payload.gender}
                                 onChange={handleChange('gender')}
                             >
@@ -195,10 +312,10 @@ function Create() {
                         </Box>
                     </Card>
                     <Box sx={{ display: 'flex', flexDirection: 'column', width: '50%', justifyContent: 'space-evenly' }}>
-                        <Card sx={{ width: '100%', height: '65%', mr: 5, p: 2 }} elevation={20}>
+                        <Card sx={{ width: '100%', height: '60%', mr: 5, p: 2 }} elevation={20}>
                             <Box sx={{ width: '100%', height: '65%', mr: 5, display: 'flex', justifyContent: 'space-evenly' }}>
                                 <Box sx={{ width: '45%', display: 'flex', flexDirection: 'column' }}>
-                                    <Typography sx={{ fontSize: 24, color: '#555', fontWeight: '400' }}>Additional Information</Typography>
+                                    <Typography sx={{ fontSize: 24, color: '#555', fontWeight: '400', mb: 1 }}>Additional Information</Typography>
                                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
                                         <TextField
                                             id="outlined-required"
@@ -208,6 +325,7 @@ function Create() {
                                             type='number'
                                             inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                                             sx={{ width: '210px' }}
+                                            size='small'
                                         />
                                         <TextField
                                             id="outlined-required"
@@ -217,6 +335,7 @@ function Create() {
                                             type='number'
                                             inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                                             sx={{ width: '210px' }}
+                                            size='small'
                                         />
                                     </Box>
 
@@ -227,8 +346,9 @@ function Create() {
                                         value={payload.status}
                                         onChange={handleChange('status')}
                                         sx={{ mb: 2 }}
+                                        size='small'
                                     >
-                                        {currencies.map((option) => (
+                                        {civilStatus.map((option) => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.label}
                                             </MenuItem>
@@ -241,6 +361,7 @@ function Create() {
                                         value={payload.religion}
                                         onChange={handleChange('religion')}
                                         sx={{ mb: 2 }}
+                                        size='small'
                                     />
                                     <TextField
                                         id="outlined-required"
@@ -249,6 +370,7 @@ function Create() {
                                         value={payload.citizenship}
                                         onChange={handleChange('citizenship')}
                                         sx={{ mb: 2 }}
+                                        size='small'
                                     />
                                     <TextField
                                         id="outlined-required"
@@ -257,6 +379,7 @@ function Create() {
                                         value={payload.occupation}
                                         onChange={handleChange('occupation')}
                                         sx={{ mb: 2 }}
+                                        size='small'
                                     />
                                     <TextField
                                         id="outlined-required"
@@ -265,10 +388,11 @@ function Create() {
                                         onChange={handleChange('languageSpoken')}
                                         helperText='Please seperate by ","'
                                         sx={{ mb: 2 }}
+                                        size='small'
                                     />
                                 </Box>
                                 <Box sx={{ width: '45%', display: 'flex', flexDirection: 'column' }}>
-                                    <Typography sx={{ fontSize: 24, color: '#555', fontWeight: '400' }}>Educational Background</Typography>
+                                    <Typography sx={{ fontSize: 24, color: '#555', fontWeight: '400', mb: 1 }}>Educational Background</Typography>
                                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
                                         <TextField
                                             id="outlined-required"
@@ -277,6 +401,7 @@ function Create() {
                                             value={payload.elementary}
                                             onChange={handleChange('elementary')}
                                             sx={{ width: '300px' }}
+                                            size='small'
                                         />
                                         <TextField
                                             id="outlined-required"
@@ -284,6 +409,7 @@ function Create() {
                                             value={payload.elementaryYearGraduated}
                                             onChange={handleChange('elementaryYearGraduated')}
                                             sx={{ width: '100px' }}
+                                            size='small'
                                         />
                                     </Box>
                                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
@@ -294,6 +420,7 @@ function Create() {
                                             value={payload.highSchool}
                                             onChange={handleChange('highSchool')}
                                             sx={{ width: '300px' }}
+                                            size='small'
                                         />
                                         <TextField
                                             id="outlined-required"
@@ -301,6 +428,7 @@ function Create() {
                                             value={payload.highSchoolYearGraduated}
                                             onChange={handleChange('highSchoolYearGraduated')}
                                             sx={{ width: '100px' }}
+                                            size='small'
                                         />
                                     </Box>
                                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', mb: 2 }}>
@@ -311,6 +439,7 @@ function Create() {
                                             value={payload.college}
                                             onChange={handleChange('college')}
                                             sx={{ width: '300px' }}
+                                            size='small'
                                         />
                                         <TextField
                                             id="outlined-required"
@@ -318,6 +447,7 @@ function Create() {
                                             value={payload.collegeYearGraduated}
                                             onChange={handleChange('collegeYearGraduated')}
                                             sx={{ width: '100px' }}
+                                            size='small'
                                         />
                                     </Box>
                                     <TextField
@@ -327,6 +457,7 @@ function Create() {
                                         value={payload.degree}
                                         onChange={handleChange('degree')}
                                         sx={{ mb: 2 }}
+                                        size='small'
                                     />
                                     <TextField
                                         id="outlined-multiline-static"
@@ -334,14 +465,15 @@ function Create() {
                                         value={payload.skills}
                                         onChange={handleChange('skills')}
                                         multiline
+                                        size='small'
                                         rows={4}
                                     />
                                 </Box>
                             </Box>
                         </Card>
-                        <Card sx={{ width: '100%', height: '25%', mr: 5, p: 2 }} elevation={10}>
+                        <Card sx={{ width: '100%', height: '20%', mr: 5, p: 2, mt: 1 }} elevation={10}>
                             <Typography sx={{ mb: 2, fontSize: 24, color: '#555', fontWeight: '400' }}>Contact Information</Typography>
-                            <Box sx={{ width: '100%', height: '25%', mr: 5, display: 'flex', justifyContent: 'space-evenly' }}>
+                            <Box sx={{ width: '100%', mr: 5, display: 'flex', justifyContent: 'space-evenly' }}>
                                 <Box sx={{ width: '45%', display: 'flex', flexDirection: 'column' }}>
                                     <TextField
                                         required
@@ -352,14 +484,27 @@ function Create() {
                                     />
                                 </Box>
                                 <Box sx={{ width: '45%', display: 'flex', flexDirection: 'column' }}>
-                                    <MuiTelInput defaultCountry="PH" value={mobileNum} onChange={handleValidity} label='Contact Number' />
+                                    <MuiTelInput defaultCountry="PH" value={mobileNum} onChange={handleValidity} label='Contact Number' required />
                                 </Box>
                             </Box>
                         </Card>
+                        <Box sx={{ display: 'flex', width: '100%', p: 2 }}>
+                            <Box sx={{ flexGrow: 1 }}></Box>
+                            <Box sx={{ width: '25%', display: 'flex', justifyContent: 'space-evenly' }}>
+                                <Button variant='contained' color='success' sx={{ width: '150px', marginX: 1 }} onClick={handleUpload}>
+                                    Save <SaveIcon />
+                                </Button>
+                                <Button variant='contained' color='error' sx={{ width: '150px', marginX: 1 }}>
+                                    Discard <DisabledByDefaultIcon />
+                                </Button>
+                            </Box>
+
+                        </Box>
+
                     </Box>
                 </Box>
             </Box>
-        </Box>
+        </Box >
     )
 }
 
