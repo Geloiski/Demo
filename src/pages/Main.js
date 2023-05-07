@@ -14,8 +14,11 @@ import {
     FormControlLabel,
     Switch,
     Button,
-    Grid, Card, Typography
+    Grid,
+    Card,
+    Typography
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { visuallyHidden } from '@mui/utils';
 
 function createData(name, age, address, email, mobileNum) {
@@ -235,7 +238,14 @@ function Main() {
                         label="Dense padding"
                     />
                     <Box sx={{ flexGrow: 1 }} />
-                    <Button variant='contained'>Create New Data</Button>
+                    <Box sx={{ display: 'flex', justifyContent: selected.length > 0 ? 'space-between' : 'flex-end', width: '300px' }}>
+                        {selected.length > 0 ?
+                            < Button variant="outlined" startIcon={<DeleteIcon />}>
+                                Delete
+                            </Button> : null
+                        }
+                        <Button variant='contained'>Create New Data</Button>
+                    </Box>
                 </Box>
                 <Paper sx={{ width: '100%', mb: 2, border: 1 }}>
                     <TableContainer>
@@ -290,7 +300,8 @@ function Main() {
                                             <TableCell align="center">{row.email}</TableCell>
                                             <TableCell align="center">{row.mobileNum}</TableCell>
                                             <TableCell align="center">
-                                                <Button variant="contained" size={dense ? 'small' : 'medium'} onClick={() => handleClick(row.id)}>Edit</Button>
+                                                <Button variant="contained" size={dense ? 'small' : 'medium'} onClick={() => handleClick(row.id)} sx={{ marginX: 1 }}>Veiw</Button>
+                                                <Button variant="contained" size={dense ? 'small' : 'medium'} onClick={() => handleClick(row.id)} sx={{ marginX: 1 }}>Edit</Button>
                                             </TableCell>
                                         </TableRow>
                                     );
@@ -318,7 +329,7 @@ function Main() {
                     />
                 </Paper>
             </Box>
-        </Box>
+        </Box >
     );
 }
 export default Main

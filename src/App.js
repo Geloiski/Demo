@@ -5,6 +5,7 @@ import Main from './pages/Main';
 import Create from './pages/Create'
 import Edit from './pages/Edit'
 import NotFound from './pages/NotFound'
+import View from './pages/View';
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +26,7 @@ function App() {
         <Route path='/' element={<Navigate to='/dashboard' />} />
         <Route path='dashboard' element={<Main />} />
         <Route path='create' element={<Create />} />
+        <Route path='view' element={<View />} />
         <Route path='edit' element={<Edit />} />
         <Route path='error404' element={<NotFound />} />
       </Routes>
