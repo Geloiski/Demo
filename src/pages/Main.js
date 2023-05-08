@@ -214,7 +214,7 @@ function Main() {
                                     Delete
                                 </Button> : null
                             }
-                            <Button variant='contained'>Create New Data</Button>
+                            <Button variant='contained' onClick={()=>navigate('/create')}>Create New Data</Button>
                         </Box>
                     </Box>
                     <Paper sx={{ width: '100%', mb: 2, border: 1 }}>
