@@ -90,11 +90,13 @@ function EnhancedTableHead(props) {
                         {headCell.label}
                     </TableCell>
                 ))}
-                <TableCell align='center'>
-                    Action
-                </TableCell>
+                {numSelected > 0 ? null :
+                    < TableCell align='center'>
+                        Action
+                    </TableCell>
+                }
             </TableRow>
-        </TableHead>
+        </TableHead >
     );
 }
 
@@ -215,7 +217,7 @@ function Main() {
                                     Delete
                                 </Button> : null
                             }
-                            <Button variant='contained' onClick={()=>navigate('/create')}>Create New Data</Button>
+                            <Button variant='contained' onClick={() => navigate('/create')}>Create New Data</Button>
                         </Box>
                     </Box>
                     <Paper sx={{ width: '100%', mb: 2, border: 1 }}>
@@ -270,10 +272,12 @@ function Main() {
                                                 <TableCell align="left">{row.data.address}</TableCell>
                                                 <TableCell align="left">{row.data.email}</TableCell>
                                                 <TableCell align="left">{row.data.mobileNumber}</TableCell>
-                                                <TableCell align="center">
-                                                    <Button variant="contained" size={dense ? 'small' : 'medium'} onClick={() => navigate(`/view/${row.id}/${row.data.firstname}`)} sx={{ marginX: 1 }}>Veiw</Button>
-                                                    <Button variant="contained" size={dense ? 'small' : 'medium'} onClick={() => navigate(`/edit/${row.id}/${row.data.firstname}`)} sx={{ marginX: 1 }}>Edit</Button>
-                                                </TableCell>
+                                                {selected.length > 0 ? null :
+                                                    <TableCell align="center">
+                                                        <Button variant="contained" size={dense ? 'small' : 'medium'} onClick={() => navigate(`/view/${row.id}/${row.data.firstname}`)} sx={{ marginX: 1 }}>Veiw</Button>
+                                                        <Button variant="contained" size={dense ? 'small' : 'medium'} onClick={() => navigate(`/edit/${row.id}/${row.data.firstname}`)} sx={{ marginX: 1 }}>Edit</Button>
+                                                    </TableCell>
+                                                }
                                             </TableRow>
                                         );
                                     })}
