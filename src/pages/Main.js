@@ -186,6 +186,7 @@ function Main() {
         if (window.confirm("Are you sure you want to DELETE?")) {
             selected.forEach((id) => { deleteDoc(doc(db, "dataCollection", `${id}`)); })
         }
+        setSelected([])
     };
     if (isLoading === true) {
         return (

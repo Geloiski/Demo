@@ -29,12 +29,6 @@ function Create() {
   const [image, setimage] = useState(null)
   const [birthday, setBirthday] = useState(dayjs(currentData.birthdate));
   const [mobileNum, setMobileNum] = useState('')
-  const handleDate = (newValue) => {
-    setPayload({ ...payload, birthdate: newValue })
-  };
-  const handleValidity = (newValue) => {
-    setMobileNum(newValue);
-  }
   const [payload, setPayload] = useState({
     firstname: '',
     lastname: '',
@@ -60,6 +54,15 @@ function Create() {
     skills: '',
     email: '',
   })
+
+  const handleDate = (newValue) => {
+    setBirthday(newValue)
+    setPayload({ ...payload, birthdate: dayjs(newValue) });
+  };
+  const handleValidity = (newValue) => {
+    setMobileNum(newValue);
+  }
+
   const civilStatus = [
     {
       value: 'single',
@@ -100,7 +103,7 @@ function Create() {
         lastname: payload.lastname === '' ? currentData.lastname : payload.lastname,
         middlename: payload.middlename === '' ? currentData.middlename : payload.middlename,
         age: payload.age === '' ? currentData.age : payload.age,
-        birthdate: moment(payload.birthdate === '' ? currentData.birthdate : payload.birthdate).format('ll'),
+        birthdate: dayjs(payload.birthdate === '' ? currentData.birthdate : payload.birthdate).format('ll'),
         address: payload.address === '' ? currentData.address : payload.address,
         gender: payload.gender === '' ? currentData.gender : payload.gender,
         height: payload.height === '' ? currentData.height : payload.height,
@@ -150,7 +153,7 @@ function Create() {
               lastname: payload.lastname === '' ? currentData.lastname : payload.lastname,
               middlename: payload.middlename === '' ? currentData.middlename : payload.middlename,
               age: payload.age === '' ? currentData.age : payload.age,
-              birthdate: moment(payload.birthdate === '' ? currentData.birthdate : payload.birthdate).format('ll'),
+              birthdate: dayjs(payload.birthdate === '' ? currentData.birthdate : payload.birthdate).format('ll'),
               address: payload.address === '' ? currentData.address : payload.address,
               gender: payload.gender === '' ? currentData.gender : payload.gender,
               height: payload.height === '' ? currentData.height : payload.height,
@@ -290,7 +293,7 @@ function Create() {
                         inputFormat="MM/dd/yyyy"
                         maxDate={dayjs()}
                         minDate={dayjs('1900-01-01')}
-                        defaultValue={dayjs(birthday)}
+                        defaultValue={dayjs(currentData.birthdate)}
                         onChange={handleDate}
                       />
                     </DemoContainer>

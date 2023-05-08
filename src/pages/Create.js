@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Card, IconButton, Avatar, Badge, TextField, Radio, RadioGroup, FormControlLabel, MenuItem, Typography, Button, CircularProgress } from '@mui/material'
-import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider, DesktopDatePicker } from '@mui/x-date-pickers';
 import { MuiTelInput } from 'mui-tel-input'
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
@@ -19,6 +18,7 @@ import {
 } from "firebase/storage";
 import moment from 'moment/moment';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 function Create() {
     let navigate = useNavigate();
@@ -27,19 +27,13 @@ function Create() {
     const [image, setimage] = useState(null)
     const [birthday, setBirthday] = useState(dayjs('2014-08-18'));
     const [mobileNum, setMobileNum] = useState('')
-    const handleDate = (newValue) => {
-        setPayload({ ...payload, birthdate: newValue })
-    };
-    const handleValidity = (newValue) => {
-        setMobileNum(newValue);
-    }
     const [payload, setPayload] = useState({
         firstname: '',
         lastname: '',
         middlename: '',
         age: '',
-        birthdate: '',
         address: '',
+        birthdate: '',
         gender: 'female',
         height: '',
         weight: '',
@@ -58,6 +52,18 @@ function Create() {
         skills: '',
         email: '',
     })
+
+    const handleChange = (prop) => (event) => {
+        setPayload({ ...payload, [prop]: event.target.value });
+    };
+
+    const handleDate = (newValue) => {
+        setBirthday(newValue)
+        setPayload({ ...payload, birthdate: dayjs(newValue) });
+    };
+    const handleValidity = (newValue) => {
+        setMobileNum(newValue);
+    }
     const civilStatus = [
         {
             value: 'single',
@@ -80,9 +86,7 @@ function Create() {
             label: 'Widowed',
         },
     ];
-    const handleChange = (prop) => (event) => {
-        setPayload({ ...payload, [prop]: event.target.value });
-    };
+
     function handleImageChange(event) {
         console.log(event.target.files);
         setimage(event.target.files[0])
@@ -130,7 +134,7 @@ function Create() {
                             lastname: payload.lastname,
                             middlename: payload.middlename,
                             age: payload.age,
-                            birthdate: moment(payload.birthdate).format('ll'),
+                            birthdate: dayjs(payload.birthdate).format('ll'),
                             address: payload.address,
                             gender: payload.gender,
                             height: payload.height,
@@ -161,7 +165,7 @@ function Create() {
     const handleClear = () => {
         setProfile('')
         setimage(null)
-        setBirthday(dayjs('2014-08-18'))
+        setBirthday(new Date('2014-08-18'))
         setMobileNum('')
         setPayload({
             ...payload,
@@ -289,7 +293,6 @@ function Create() {
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DemoContainer components={['DateTimePicker']}>
                                             <DesktopDatePicker
-                                                required
                                                 label="Birthdate"
                                                 inputFormat="MM/dd/yyyy"
                                                 maxDate={dayjs()}
