@@ -505,8 +505,14 @@ function Create() {
                   <Button variant='contained' color='success' sx={{ width: '150px', marginX: 1 }} onClick={handleReUpload}>
                     Save <SaveIcon />
                   </Button>
-                  <Button variant='contained' color='error' sx={{ width: '150px', marginX: 1 }}>
-                    Discard <DisabledByDefaultIcon />
+                  <Button variant='contained' color='error' sx={{ width: '150px', marginX: 1 }}
+                    onClick={() => {
+                      if (window.confirm("Do you really want to leave?")) {
+                        navigate('/dashboard')
+                      }
+                    }
+                    }>
+                    Back <DisabledByDefaultIcon sx={{ ml: 1 }} />
                   </Button>
                 </Box>
 

@@ -16,7 +16,6 @@ import {
     uploadBytesResumable,
     getDownloadURL
 } from "firebase/storage";
-import moment from 'moment/moment';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 
@@ -507,10 +506,16 @@ function Create() {
                                 <Box sx={{ flexGrow: 1 }}></Box>
                                 <Box sx={{ width: '25%', display: 'flex', justifyContent: 'space-evenly' }}>
                                     <Button variant='contained' color='success' sx={{ width: '150px', marginX: 1 }} onClick={handleUpload}>
-                                        Save <SaveIcon />
+                                        Save <SaveIcon sx={{ ml: 1 }} />
                                     </Button>
-                                    <Button variant='contained' color='error' sx={{ width: '150px', marginX: 1 }}>
-                                        Discard <DisabledByDefaultIcon />
+                                    <Button variant='contained' color='error' sx={{ width: '150px', marginX: 1 }}
+                                        onClick={() => {
+                                            if (window.confirm("Do you really want to leave?")) {
+                                                navigate('/dashboard')
+                                            }
+                                        }
+                                        }>
+                                        Back <DisabledByDefaultIcon sx={{ ml: 1 }} />
                                     </Button>
                                 </Box>
 
