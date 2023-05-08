@@ -237,7 +237,7 @@ function Create() {
                       </IconButton>
                     }>
                     <Avatar
-                      alt="Remy Sharp"
+                      alt=""
                       src={profile === '' ? currentData.image : profile}
                       sx={{
                         width: 200, height: 200,
