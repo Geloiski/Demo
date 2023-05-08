@@ -8,30 +8,16 @@ import NotFound from './pages/NotFound'
 import View from './pages/View';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(false);
-  if (isLoading === true) {
-    return (
-      <Box style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-      }}>
-        <CircularProgress color="secondary" size={100} />
-      </Box>
-    )
-  } else {
-    return (
-      <Routes>
-        <Route path='/' element={<Navigate to='/dashboard' />} />
-        <Route path='dashboard' element={<Main />} />
-        <Route path='create' element={<Create />} />
-        <Route path='view' element={<View />} />
-        <Route path='edit' element={<Edit />} />
-        <Route path='error404' element={<NotFound />} />
-      </Routes>
-    );
-  }
+  return (
+    <Routes>
+      <Route path='/' element={<Navigate to='/dashboard' />} />
+      <Route path='dashboard' element={<Main />} />
+      <Route path='create' element={<Create />} />
+      <Route path='view/:id/:name' element={<View />} />
+      <Route path='edit/:id/:name' element={<Edit />} />
+      <Route path='error404' element={<NotFound />} />
+    </Routes>
+  );
 }
 
 export default App;
