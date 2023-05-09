@@ -29,7 +29,6 @@ function Create() {
   const [image, setimage] = useState(null)
   const [birthday, setBirthday] = useState(dayjs(currentData.birthdate));
   const [mobileNum, setMobileNum] = useState('')
-
   const [payload, setPayload] = useState({
     firstname: '',
     lastname: '',
